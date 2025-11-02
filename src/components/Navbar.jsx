@@ -1,64 +1,50 @@
-import React from 'react';
-import { Rocket, Github, Linkedin } from 'lucide-react';
-
-const links = [
-  { id: 'home', label: 'Home' },
-  { id: 'projects', label: 'Projects' },
-  { id: 'contact', label: 'Contact' },
-];
+import { useEffect, useState } from 'react';
+import { Github, Linkedin, Mail, Rocket } from 'lucide-react';
+import { motion, useScroll } from 'framer-motion';
 
 export default function Navbar() {
-  const handleScroll = (id) => {
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
+  const { scrollYProgress } = useScroll();
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   return (
-    <header className="sticky top-0 z-50 backdrop-blur supports-[backdrop-filter]:bg-[#0b0f14]/60">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
-        <button
-          onClick={() => handleScroll('home')}
-          className="group inline-flex items-center gap-2 rounded-md px-2 py-1 text-white/90 transition hover:text-white"
-        >
-          <span className="grid h-8 w-8 place-items-center rounded-md bg-gradient-to-br from-indigo-500 to-purple-600 text-white">
-            <Rocket className="h-4 w-4" />
-          </span>
-          <span className="font-semibold tracking-wide">Insigns</span>
-        </button>
+    <header className={`fixed top-0 left-0 right-0 z-50 transition-all ${
+      scrolled ? 'backdrop-blur-md bg-white/70 shadow-sm' : 'bg-transparent'
+    }`}>
+      {/* Scroll progress bar */}
+      <motion.div
+        className="h-1 bg-gradient-to-r from-indigo-500 via-fuchsia-500 to-amber-400"
+        style={{ scaleX: scrollYProgress, transformOrigin: '0% 50%' }}
+      />
 
-        <nav className="hidden items-center gap-6 md:flex">
-          {links.map((l) => (
-            <button
-              key={l.id}
-              onClick={() => handleScroll(l.id)}
-              className="text-sm text-white/70 transition hover:text-white"
-            >
-              {l.label}
-            </button>
-          ))}
-        </nav>
-
+      <nav className="mx-auto max-w-6xl px-4 sm:px-6 py-3 flex items-center justify-between">
+        <a href="#home" className="flex items-center gap-2 font-semibold tracking-tight">
+          <Rocket className="h-5 w-5 text-indigo-600" />
+          <span className="text-slate-800">My Portfolio</span>
+        </a>
+        <div className="hidden sm:flex items-center gap-6 text-slate-700">
+          <a href="#home" className="hover:text-slate-900 transition-colors">Home</a>
+          <a href="#projects" className="hover:text-slate-900 transition-colors">Projects</a>
+          <a href="#contact" className="hover:text-slate-900 transition-colors">Contact</a>
+        </div>
         <div className="flex items-center gap-2">
-          <a
-            href="https://github.com"
-            target="_blank"
-            rel="noreferrer"
-            className="rounded-md p-2 text-white/70 transition hover:bg-white/5 hover:text-white"
-            aria-label="GitHub"
-          >
+          <a aria-label="GitHub" href="https://github.com" target="_blank" rel="noreferrer" className="p-2 rounded-md hover:bg-slate-100">
             <Github className="h-5 w-5" />
           </a>
-          <a
-            href="https://linkedin.com"
-            target="_blank"
-            rel="noreferrer"
-            className="rounded-md p-2 text-white/70 transition hover:bg-white/5 hover:text-white"
-            aria-label="LinkedIn"
-          >
+          <a aria-label="LinkedIn" href="https://linkedin.com" target="_blank" rel="noreferrer" className="p-2 rounded-md hover:bg-slate-100">
             <Linkedin className="h-5 w-5" />
           </a>
+          <a aria-label="Email" href="#contact" className="p-2 rounded-md hover:bg-slate-100">
+            <Mail className="h-5 w-5" />
+          </a>
         </div>
-      </div>
+      </nav>
     </header>
   );
 }
